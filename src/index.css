@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom Scrollbar for whole project */
+@layer utilities {
+    .scrollbar-custom::-webkit-scrollbar {
+        width: 2px;
+    }
+
+    .scrollbar-custom::-webkit-scrollbar-track {
+        background: #f1d6db;
+        border-radius: 2px;
+    }
+
+    .scrollbar-custom::-webkit-scrollbar-thumb {
+        background: #bc8f96;
+        border-radius: 2px;
+    }
+
+    .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+        background: #f1d6db;
+    }
+}

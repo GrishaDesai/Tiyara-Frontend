@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+    .scrollbar-custom::-webkit-scrollbar {
+        width: 2px;
+    }
+
+    .scrollbar-custom::-webkit-scrollbar-track {
+        background: #f1d6db;
+        border-radius: 2px;
+    }
+
+    .scrollbar-custom::-webkit-scrollbar-thumb {
+        background: #bc8f96;
+        border-radius: 2px;
+    }
+
+    .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+        background: #f1d6db;
+    }
+}
+
+select {
+    max-width: 100%;
+    overflow-x: hidden;
+    /* Prevents horizontal overflow */
+}

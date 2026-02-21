@@ -1,0 +1,382 @@
+import React, { useState, useEffect } from "react";
+import flower from "../assets/svg/flower2.svg";
+import model1 from "../assets/image/model1.png";
+import model2 from "../assets/image/model3.png";
+import model3 from "../assets/image/model31.png";
+import style11 from "../assets/image/style11.webp";
+import style12 from "../assets/image/style12.webp";
+import style13 from "../assets/image/style13.webp";
+import style14 from "../assets/image/style14.jpeg";
+import style21 from "../assets/image/style21.avif";
+import style22 from "../assets/image/style22.jpg";
+import style23 from "../assets/image/style23.jpg";
+import style24 from "../assets/image/style24.jpg";
+import style31 from "../assets/image/style31.jpg";
+import style32 from "../assets/image/style32.jpg";
+import style33 from "../assets/image/style33.jpg";
+import style34 from "../assets/image/style34.jpg";
+import Navbar from "../components/Navbar";
+import { useNavigate } from "react-router-dom";
+import bodyshape from "../assets/image/bodyshape1-removebg-preview.png";
+import bodyshapeBg1 from "../assets/image/bodyshape-bg5.png";
+import Footer from "../components/Footer";
+// import { FaArrowRight } from "react-icons/fa";
+import skintonebg from "../assets/image/skintonebg.png";
+import Loader from "../components/Loader";
+import {fetchMainCategories} from '../apis/categories'
+import { fetchOccasions } from '../apis/occasion'
+import type{Occasion} from '../types/occasion'
+import type { MainCategory } from '../types/mainCategory'
+
+
+export default function Home() {
+  const models: string[] = [model1, model2, model3];
+  const styles: string[][] = [
+    [style11, style12, style13, style14],
+    [style21, style22, style23, style24],
+    [style34, style31, style33, style32],
+  ];
+  const prices: number[] = [500, 1000, 1500, 2000, 2500, 3000, 5000, 10000];
+
+  const [isMobile, setIsMobile] = useState < boolean > (false);
+  const [cat, setCat] = useState < MainCategory[] > ([]);
+  const [occasions, setOccasions] = useState < Occasion[] > ([]);
+  const [currentModel, setCurrentModel] = useState < number > (0);
+  const [bottomImages, setBottomImages] = useState < string[] > (styles[0]);
+  const [isLoading, setIsLoading] = useState < boolean > (true);
+  const [fade, setFade] = useState < boolean > (false);
+
+  const navigate = useNavigate();
+
+  const animations: string[] = [
+    "translate-x-[-100%] opacity-0",
+    "translate-y-[100%] opacity-0",
+    "translate-x-[100%] opacity-0",
+    "scale-50 opacity-0",
+  ];
+
+  // Rotate models & bottom images
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setFade(true);
+      setTimeout(() => {
+        setCurrentModel((prev) => (prev + 1) % models.length);
+        setBottomImages(styles[(currentModel + 1) % models.length]);
+        setFade(false);
+      }, 2000);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [currentModel, models.length, styles]);
+
+  // Check screen size
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkScreenSize();
+    window.addEventListener("resize", checkScreenSize);
+
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
+
+  // Fetch API data
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        const [categories, occs] = await Promise.all([fetchMainCategories(), fetchOccasions()]);
+        console.log("categories- ", categories);
+        setCat(categories);
+        setOccasions(occs);
+      } catch (err) {
+        console.error("Error fetching home data:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (isLoading || (cat.length === 0 && occasions.length === 0)) {
+    return <Loader />;
+  }
+
+  return (
+    <div className="overflow-y-auto scrollbar-custom h-screen">
+      <Navbar />
+
+      {/* Mobile Section */}
+      {isMobile ? (
+        // 🌟 Render for Mobile (sm)
+        <div className="relative bg-blush px-6 py-10">
+          <div className="flex flex-col-reverse md:flex-row justify-between items-center">
+            <div className="w-full md:w-1/2 text-center md:text-left">
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-plum mb-4">
+                Tiyara -
+              </h1>
+              <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold text-plum opacity-80 leading-tight mb-6">
+                Crowning Your Style with Elegance and Glamour.
+              </h2>
+              <button
+                className="bg-plum rounded-md px-5 py-3 text-ivory font-medium text-lg hover:bg-wine transition-all duration-300"
+                onClick={() => navigate('/product')}
+              >
+                Start Shopping
+              </button>
+            </div>
+            <div className="w-full md:w-1/2 flex justify-center relative mt-6 md:mt-0">
+              <div className="relative w-60 h-72 sm:w-80 sm:h-96 lg:w-[400px] lg:h-[500px] overflow-hidden">
+                <img
+                  src={flower}
+                  alt="flower"
+                  className="absolute inset-0 w-full h-full object-cover opacity-60"
+                />
+                <img
+                  src={models[currentModel]}
+                  alt="model"
+                  className={`absolute inset-0 w-full h-full object-contain transition-all duration-[3000ms] ${fade ? "opacity-0 scale-50" : "opacity-100 scale-100"
+                    }`}
+                />
+              </div>
+            </div>
+          </div>
+          <div className="mt-10 flex justify-center gap-4">
+            {bottomImages.map((image, index) => (
+              <img
+                key={index}
+                src={image}
+                alt={`style-${index}`}
+                className={`w-20 h-20 sm:w-28 sm:h-28 lg:w-36 lg:h-36 object-cover rounded-lg shadow-lg transition-all duration-1000 ${fade ? "opacity-0 translate-y-6" : "opacity-100 translate-y-0"
+                  }`}
+              />
+            ))}
+          </div>
+        </div>
+      ) : (
+        // 💻 Render for Desktop (md and larger)
+        <div className="relative bg-blush">
+          <div className="mt-16 w-full flex justify-between">
+            <div className="w-[50%] px-20 pt-20">
+              <h1 className="text-7xl font-extrabold text-plum mb-5">Tiyara -</h1>
+              <h2 className="text-5xl font-bold text-plum opacity-80 mb-10" style={{ lineHeight: "55px" }}>
+                Crowning Your Style with Elegance and Glamour.
+              </h2>
+              <button
+                className="bg-plum rounded-md px-5 py-3 text-ivory font-medium hover:bg-wine transition-all duration-300"
+                onClick={() => navigate('/product')}
+              >
+                Start Shopping
+              </button>
+            </div>
+            <div className="w-[50%] px-4 text-center relative">
+              <div className="relative flex items-center justify-center">
+                <img
+                  src={flower}
+                  alt="flower"
+                  className="absolute top-0 left-0 w-full h-full object-cover opacity-60"
+                />
+                <div className="relative w-[400px] h-[500px] overflow-hidden">
+                  <img
+                    src={models[currentModel]}
+                    alt="model"
+                    className={`absolute top-0 left-0 w-full h-full object-contain transition-all duration-[3000ms] ${fade ? animations[currentModel % animations.length] : "translate-x-0 translate-y-0 scale-100 opacity-100"
+                      }`}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="absolute bottom-0 w-full leading-none">
+            <svg
+              viewBox="0 0 1200 120"
+              xmlns="http://www.w3.org/2000/svg"
+              preserveAspectRatio="none"
+              className="w-full h-24"
+            >
+              <path d="M0,100 C400,200 800,0 1200,100 V120 H0 Z" fill="white"></path>
+            </svg>
+            <div className="absolute bottom-[-80px] p-5 right-[5%] transform flex gap-6 z-10">
+              {bottomImages.map((image, index) => (
+                <img
+                  key={index}
+                  src={image}
+                  alt={`bottom-style-${index}`}
+                  className={`w-[150px] h-[150px] object-cover rounded-lg shadow-lg transition-all duration-1000 ${fade ? "opacity-0 translate-y-6" : "opacity-100 translate-y-0"
+                    }`}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Categories */}
+      <div className="mt-10 md:mt-40">
+        <h2 className="text-plum text-2xl ms-5 font-bold">🌸 Style by Category</h2>
+        <div className="flex flex-nowrap overflow-x-auto justify-evenly scrollbar-custom mb-16">
+          {cat.map((category, index) => (
+            <div
+              key={index}
+              className="flex flex-col items-center"
+              onClick={() => navigate(`/category/${category.m_cat}`)}
+            >
+              <div className="relative w-44 h-48 flex flex-col items-center">
+                <img
+                  src={`../../${category.image}`}
+                  alt={category.m_cat}
+                  className="w-28 h-44 object-cover absolute rounded-b-full bottom-0"
+                  style={{ zIndex: "10" }}
+                />
+                <div className="w-40 h-40 bg-rose rounded-full shadow-lg absolute bottom-0"></div>
+              </div>
+              <h3 className="mt-4 text-lg font-semibold text-plum">{category.m_cat}</h3>
+            </div>
+          ))}
+        </div>
+
+        {/* Occasions */}
+        <h2 className="text-plum text-2xl ms-5 mb-5 font-bold">🌸 Style by Occasion</h2>
+        <div className="flex flex-nowrap overflow-x-auto justify-evenly items-end h-44 scrollbar-custom mb-16">
+          {occasions.map((occ, index) => (
+            <div key={index} className="relative flex flex-col items-center mx-4">
+              {index % 2 !== 0 ? (
+                <div className="relative w-44 h-48 flex flex-col items-center" onClick={() => navigate(`/occasion/${occ.occasion}`)}>
+                  <img
+                    src={`../assets/image${occ.image}`}
+                    alt={occ.image}
+                    className="h-44 object-contain absolute bottom-0 right-5"
+                    style={{ zIndex: "10" }}
+                  />
+                  <span className="absolute top-20 left-3 bg-white px-3 py-1 rounded-full text-sm font-semibold text-wine shadow-lg z-20">
+                    {occ.occasion}
+                  </span>
+                  <div className="w-44 h-32 bg-blush rounded-3xl shadow-lg absolute bottom-0"></div>
+                </div>
+              ) : (
+                <div className="relative w-32 h-48 flex flex-col items-center" onClick={() => navigate(`/occasion/${occ.occasion}`)}>
+                  <img
+                    src={`/assets/image${occ.image}`}
+                    alt={occ.image}
+                    className="w-28 h-44 object-contain absolute bottom-0 right-0"
+                    style={{ zIndex: "10" }}
+                  />
+                  <span className="absolute top-11 left-0 bg-white px-2 py-1 rounded-full text-sm font-semibold text-wine shadow-lg z-20">
+                    {occ.occasion}
+                  </span>
+                  <div className="w-40 h-40 bg-blush rounded-3xl shadow-lg absolute bottom-0"></div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Price */}
+        <h2 className="text-plum text-2xl ms-5 mb-5 font-bold">🌸 Shop by Price</h2>
+        <div className="flex flex-nowrap overflow-x-auto justify-evenly scrollbar-custom mb-10">
+          {prices.map((price, index) => (
+            <div key={index} className="flex flex-col items-center mx-2">
+              {index % 2 !== 0 ? (
+                <div
+                  className="bg-blush w-40 h-40 rounded-3xl flex flex-col justify-center items-center hover:bg-moonstone transition-all duration-300"
+                  onClick={() => navigate(`price/${price}`)}
+                >
+                  <h3 className="font-semibold text-wine opacity-75">Under</h3>
+                  <h3 className="text-3xl font-extrabold text-plum">₹ {price}</h3>
+                </div>
+              ) : (
+                <div
+                  className="bg-blush w-44 h-32 rounded-3xl flex flex-col justify-center items-center hover:bg-moonstone transition-all duration-300"
+                  onClick={() => navigate(`price/${price}`)}
+                >
+                  <h3 className="font-semibold text-wine opacity-75">Under</h3>
+                  <h3 className="text-3xl font-extrabold text-plum">₹ {price}</h3>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Body Shape */}
+        <div
+          className="my-20 mx-10 px-10 lg:px-40 py-10 flex flex-col md:flex-row justify-around items-center rounded-tr-[100px] rounded-bl-[100px] lg:rounded-tr-[300px] lg:rounded-bl-[300px] overflow-hidden"
+          style={{
+            backgroundImage: `url(${bodyshapeBg1})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center bottom",
+            backgroundRepeat: "no-repeat",
+          }}
+        >
+          <div className="relative h-96 my-10 w-96 flex gap-3 items-end justify-center">
+            <div className="w-64 h-64 lg:w-80 lg:h-80 bg-blush rounded-t-full shadow-lg absolute bottom-0"></div>
+            <img
+              src={bodyshape}
+              alt="Body Shape"
+              className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-72 h-96 object-cover"
+              style={{ zIndex: 8, marginTop: "-10px" }}
+            />
+          </div>
+          <div className="max-w-lg text-center flex flex-col justify-center w-full md:w-3/4">
+            <h2 className="text-4xl font-bold text-plum mb-4">Know Your Body Shape</h2>
+            <p className="text-lg text-wine leading-relaxed mb-6">
+              Understanding your body shape is the first step towards finding styles that enhance your natural beauty. Whether you're looking for the perfect fit or just curious, we've got you covered! Get personalized clothing recommendations that flatter your figure and boost your confidence. Dress with confidence—try it now!
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-evenly">
+              <button
+                className="bg-plum text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:bg-wine transition-all duration-300"
+                onClick={() => navigate('/body-shape/measurements')}
+              >
+                Know Using Measurements
+              </button>
+              <button
+                className="bg-white border-2 border-plum text-plum font-semibold py-3 px-6 rounded-lg shadow-lg hover:bg-plum hover:text-white transition-all duration-300"
+                onClick={() => navigate('/body-shape-quiz')}
+              >
+                Take a Quick Quiz
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Skintone */}
+        <div
+          className="w-full relative h-[450px] sm:h-[450px] md:h-[500px] lg:h-72 overflow-visible my-12 sm:my-16 lg:my-28 flex items-start justify-center"
+          style={{
+            backgroundImage: `url("${skintonebg}")`,
+            backgroundSize: "cover",
+            backgroundPosition: "center bottom",
+            backgroundRepeat: "no-repeat",
+          }}
+        >
+          <div className="w-40 h-48 sm:w-44 sm:h-52 md:w-48 md:h-56 lg:w-52 lg:h-60 bg-blush rounded-lg absolute -top-8 lg:-top-10 left-1/2 lg:left-60 transform -translate-x-1/2 lg:translate-x-0 border-plum border-8">
+            <img src="/assets/image/skinhome.png" alt="skin" className="w-full h-full object-cover" />
+            <div className="absolute -right-4 sm:-right-5 top-3 sm:top-4 w-6 h-6 sm:w-8 sm:h-8 bg-[#f8dad0] border-black border-2 rounded-full"></div>
+            <div className="absolute -right-4 sm:-right-5 top-12 sm:top-16 w-6 h-6 sm:w-8 sm:h-8 bg-[#fdd9bc] border-black border-2 rounded-full"></div>
+            <div className="absolute -right-4 sm:-right-5 top-20 sm:top-28 w-6 h-6 sm:w-8 sm:h-8 bg-[#f5c398] border-black border-2 rounded-full"></div>
+            <div className="absolute -right-4 sm:-right-5 top-28 sm:top-40 w-6 h-6 sm:w-8 sm:h-8 bg-[#c69274] border-black border-2 rounded-full"></div>
+          </div>
+          <div className="absolute top-auto bottom-4 sm:bottom-8 md:bottom-8 text-left w-11/12 sm:w-3/4 md:w-2/3 lg:w-3/6 mx-auto lg:ms-80">
+            <h2 className="text-2xl sm:text-3xl md:text-3xl lg:text-4xl font-bold text-plum mb-2 sm:mb-3 lg:mb-4">
+              Discover Your Perfect Shades!
+            </h2>
+            <p className="text-wine font-semibold text-base sm:text-lg md:text-lg lg:text-lg mb-4 sm:mb-5 lg:mb-6">
+              Tired of guessing what shades suit you?<br />
+              Our AI-powered skin tone analysis gives you tailor-made color suggestions. From fashion to makeup, find tones that highlight your natural beauty. No more trial and error, just confident choices.
+            </p>
+            <button
+              className="bg-plum text-white font-semibold py-2 sm:py-2.5 lg:py-3 px-4 sm:px-5 lg:px-6 rounded-lg shadow-lg hover:bg-blush hover:text-wine border-plum border-2 transition-all duration-300 flex justify-center items-center gap-3 sm:gap-4 lg:gap-5"
+              onClick={() => navigate('/skintone-demo')}
+            >
+              Find My Perfect Color
+            </button>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <Footer/>
+      </div>
+    </div>
+  );
+}
