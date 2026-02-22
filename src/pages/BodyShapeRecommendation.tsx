@@ -1,20 +1,15 @@
 import React, { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-
+import type { Product } from '../types/product'
+import type { Recommendation } from '../types/bodyshape'
 
 export default function BodyShapeRecommendation() {
   const location = useLocation()
   const navigate = useNavigate()
 
-  // const state = (location.state as LocationState) || {}
-  const recommendedProducts = location.state.recommendedProducts ?? []
-  const bodyShape = location.state.bodyShape ?? ''
+  const recommendedProducts: Product[] = location.state.recommendedProducts ?? []
+  const bodyShape: string = location.state.bodyShape ?? ''
   const bodyShapeData = location.state.bodyShapeData ?? {}
-
-  // console.log("location state - ",location.state);
-  // console.log("rec prod - ",recommendedProducts);
-  
-  
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState<number>(1)
@@ -34,7 +29,7 @@ export default function BodyShapeRecommendation() {
 
       {/* Scrollable Recommendations */}
       <div className="flex overflow-x-auto space-x-4 py-3 px-4 scrollbar-hide justify-evenly">
-        {bodyShapeData.recommendations?.map((item) => (
+        {bodyShapeData.recommendations?.map((item: Recommendation) => (
           <div
             key={item.name}
             className="flex flex-col justify-center items-center min-w-[100px] md:min-w-[150px]"
@@ -51,7 +46,7 @@ export default function BodyShapeRecommendation() {
 
       {/* Product Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 px-4">
-        {currentProducts.map((product) => (
+        {currentProducts.map((product: Product) => (
           <div
             key={product.Product_id}
             className="bg-white shadow-lg rounded-sm overflow-hidden"
@@ -87,8 +82,7 @@ export default function BodyShapeRecommendation() {
           <button
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
-            className={`px-4 py-2 mx-2 border rounded ${currentPage === 1 ? 'bg-gray-300 cursor-not-allowed' : 'bg-plum text-white'
-              }`}
+            className={`px-4 py-2 mx-2 border rounded ${currentPage === 1 ? 'bg-gray-300 cursor-not-allowed' : 'bg-plum text-white'}`}
           >
             Previous
           </button>
@@ -98,10 +92,7 @@ export default function BodyShapeRecommendation() {
           <button
             onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
             disabled={currentPage === totalPages || totalPages === 0}
-            className={`px-4 py-2 mx-2 border rounded ${currentPage === totalPages || totalPages === 0
-                ? 'bg-gray-300 cursor-not-allowed'
-                : 'bg-plum text-white'
-              }`}
+            className={`px-4 py-2 mx-2 border rounded ${currentPage === totalPages || totalPages === 0 ? 'bg-gray-300 cursor-not-allowed' : 'bg-plum text-white'}`}
           >
             Next
           </button>

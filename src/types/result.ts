@@ -1,5 +1,5 @@
-export interface Result<T> {
-    error: string | null,
-    message: string,
-    data: T
+export interface Result<T = unknown> {
+    error: string | boolean | null;
+    message: string;
+    data: T;
 }

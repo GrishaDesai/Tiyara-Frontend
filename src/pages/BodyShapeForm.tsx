@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import placeholder from "../assets/image/collage4.webp";
 
-import type{
+import type {
     BodyShapeFormData,
     BodyShapeDetails,
     Recommendation,
@@ -44,7 +44,6 @@ const BodyShapeForm = () => {
             setWaistHipRatio(data.waistHipRatio);
             setDetails(data.data);
             console.log(data.data);
-            
         } catch (err) {
             console.error(err);
             setError((err as Error).message || "Failed to fetch body shape.");
@@ -52,6 +51,7 @@ const BodyShapeForm = () => {
     };
 
     const handleRecommendations = async () => {
+        if (!result) return; // guard against null
         try {
             setLoading(true);
             setError(null);

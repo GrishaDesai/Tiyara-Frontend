@@ -3,26 +3,20 @@ import type { FC, ChangeEvent, MouseEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, X, Camera } from 'lucide-react';
 import logo from '../assets/image/logo.png';
+import type { Product } from '../types/product';
 
-interface Product {
-  tags?: string;
-  // Add other product fields as needed, e.g.:
-  // BrandName?: string;
-  // Individual_category?: sting;
-}
-
-interface NavbarProps {
+export interface NavbarProps {
   products: Product[] | null;
   setFilteredProducts: (products: Product[]) => void;
   resetFilters: () => void;
 }
 
 const Navbar: FC<NavbarProps> = ({ products, setFilteredProducts, resetFilters }) => {
-  const [scrolled, setScrolled] = useState < boolean > (false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState < boolean > (false);
-  const [searchTerm, setSearchTerm] = useState < string > ('');
-  const [isPopupOpen, setIsPopupOpen] = useState < boolean > (false);
-  const [selectedFile, setSelectedFile] = useState < File | null > (null);
+  const [scrolled, setScrolled] = useState<boolean>(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const navigate = useNavigate();
 
   // Scroll effect for navbar

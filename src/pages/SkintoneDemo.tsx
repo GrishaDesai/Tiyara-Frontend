@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import "../Styles/skintone.css"
+import "../styles/skintone.css"
 import { FaChevronDown, FaChevronUp } from "react-icons/fa"
 import skintoneimg from "../assets/image/skintone.png"
 import SmallLoader from "../components/SmallLoader"
@@ -8,13 +8,12 @@ import Navbar from "../components/Navbar"
 import { predictSkinTone, type SkinToneData } from "../apis/skintone"
 import type { Result } from "../types/result"
 
-
-
 export default function SkintoneDemo() {
     const [isExpanded, setIsExpanded] = useState(false)
-    const [selectedImage, setSelectedImage] = useState < File | null > (null)
-    const [response, setResponse] = useState < Result < SkinToneData > | null > (null)
+    const [selectedImage, setSelectedImage] = useState<File | null>(null)
+    const [response, setResponse] = useState<Result<SkinToneData> | null>(null)
     const [isLoading, setIsLoading] = useState(false)
+    const [products, setProducts] = useState([])
     const navigate = useNavigate()
 
     const toggleLogin = () => {
@@ -25,7 +24,7 @@ export default function SkintoneDemo() {
         e.preventDefault()
         if (!selectedImage) {
             setResponse({
-                data: null,
+                data: { skin_tone: "" },
                 error: true,
                 message: "Please select an image.",
             })
@@ -50,10 +49,13 @@ export default function SkintoneDemo() {
 
     return (
         <div className="wrapper relative mx-auto mt-24 shadow-xl overflow-hidden text-center">
-            <Navbar />
+            <Navbar
+                products={products}
+                setFilteredProducts={() => { }}
+                resetFilters={() => { }}
+            />
             <div
-                className={`login-text ${isExpanded ? "expand" : ""
-                    } bg-gradient-to-l from-lavender to-rose transition-all duration-500 ease-in-out`}
+                className={`login-text ${isExpanded ? "expand" : ""} bg-gradient-to-l from-lavender to-rose transition-all duration-500 ease-in-out`}
             >
                 <button
                     className="cta flex items-center justify-center text-xl bg-wine"
@@ -110,8 +112,8 @@ export default function SkintoneDemo() {
                         {response && (
                             <div
                                 className={`mt-5 p-3 rounded-lg ${response.error
-                                        ? "bg-red-100 border border-red-400 text-red-600"
-                                        : "bg-blush border border-rose text-rose"
+                                    ? "bg-red-100 border border-red-400 text-red-600"
+                                    : "bg-blush border border-rose text-rose"
                                     }`}
                             >
                                 {response.error ? (

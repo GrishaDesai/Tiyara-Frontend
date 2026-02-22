@@ -11,7 +11,6 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css'
 import './index.css'
 import AllCategories from './pages/AllCategories';
-import Demo from './pages/Demo';
 import AllProduct from './pages/AllProduct';
 import BodyShapeForm from './pages/BodyShapeForm';
 import BodyShapeRecommendation from './pages/BodyShapeRecommendation';

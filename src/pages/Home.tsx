@@ -48,6 +48,7 @@ export default function Home() {
 
   const navigate = useNavigate();
 
+  const [products, setProducts] = useState([])
   const animations: string[] = [
     "translate-x-[-100%] opacity-0",
     "translate-y-[100%] opacity-0",
@@ -106,7 +107,9 @@ export default function Home() {
 
   return (
     <div className="overflow-y-auto scrollbar-custom h-screen">
-      <Navbar />
+      <Navbar products={products}
+        setFilteredProducts={() => { }}
+        resetFilters={() => { }} />
 
       {/* Mobile Section */}
       {isMobile ? (

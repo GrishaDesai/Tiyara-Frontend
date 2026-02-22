@@ -15,22 +15,23 @@ const AllProduct: React.FC = () => {
   const productsPerPage = 20;
   const navigate = useNavigate();
 
-    useEffect(() => {
-      const loadProducts = async () => {
-        try {
-          setIsLoading(true);
-          const response: Result = await fetchAllProducts();
-          console.log( "response data ", response.data);
-          setProducts(response.data || []);
-        } catch (err) {
-          console.error(err);
-        } finally {
-          setIsLoading(false);
-        }
-      };
-  
-      loadProducts();
-    }, []);
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        setIsLoading(true);
+        const response: Result<Product[]> = await fetchAllProducts();
+        console.log("response data ", response.data);
+        setProducts(response.data || []);
+        setFilteredProducts(response.data || []);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadProducts();
+  }, []);
 
   const resetFilters = () => {
     setFilteredProducts(products);
@@ -51,14 +52,14 @@ const AllProduct: React.FC = () => {
       <div className="flex flex-col">
         <Navbar
           products={products}
-          setFilteredProducts={setFilteredProducts}
+          setFilteredProducts={(p: Product[]) => setFilteredProducts(p)}
           resetFilters={resetFilters}
         />
         <div className="flex mt-[65px] h-[95vh]">
           <div className="lg:w-1/6">
             <Sidebar
               products={products}
-              setFilteredProducts={setFilteredProducts}
+              setFilteredProducts={(p: Product[]) => setFilteredProducts(p)}
               resetFilters={resetFilters}
             />
           </div>
@@ -125,8 +126,8 @@ const AllProduct: React.FC = () => {
                       onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                       disabled={currentPage === 1}
                       className={`px-4 py-2 mx-2 border rounded-md ${currentPage === 1
-                          ? "bg-moonstone text-wine cursor-not-allowed"
-                          : "bg-plum text-white hover:bg-wine transition-all duration-300"
+                        ? "bg-moonstone text-wine cursor-not-allowed"
+                        : "bg-plum text-white hover:bg-wine transition-all duration-300"
                         }`}
                     >
                       Previous
@@ -140,8 +141,8 @@ const AllProduct: React.FC = () => {
                       }
                       disabled={currentPage === totalPages}
                       className={`px-4 py-2 mx-2 border rounded-md ${currentPage === totalPages
-                          ? "bg-moonstone text-wine cursor-not-allowed"
-                          : "bg-plum text-white hover:bg-wine transition-all duration-300"
+                        ? "bg-moonstone text-wine cursor-not-allowed"
+                        : "bg-plum text-white hover:bg-wine transition-all duration-300"
                         }`}
                     >
                       Next

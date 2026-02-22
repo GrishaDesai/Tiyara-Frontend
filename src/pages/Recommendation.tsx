@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { fetchRecommendations } from "../apis/products";
-import type{ Product, Recommendation } from "../types/product";
+import type { Product } from "../types/product";
+import type { Recommendation } from "../types/product";
 import Navbar from "../components/Navbar";
 import Loader from "../components/Loader";
 
-export default function Recommendation() {
-    const [product, setProduct] = useState < Product | null > (null);
-    const [recommendations, setRecommendations] = useState < Recommendation[] > ([]);
-    const [error, setError] = useState < string > ("");
+export default function RecommendationPage() {
+    const [product, setProduct] = useState<Product | null>(null);
+    const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+    const [error, setError] = useState<string>("");
     const [isLoading, setIsLoading] = useState(false);
+    const [products, setProducts] = useState<Product[]>([]);
 
-    const param = useParams < { id: string } > ();
+    const param = useParams<{ id: string }>();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -27,7 +29,6 @@ export default function Recommendation() {
         const result = await fetchRecommendations(id);
 
         console.log("rec res - ", result);
-        
 
         if (result.error || !result.data) {
             setError(result.message);
@@ -47,7 +48,11 @@ export default function Recommendation() {
 
             {isLoading && <Loader />}
 
-            <Navbar />
+            <Navbar
+                products={products}
+                setFilteredProducts={() => { }}
+                resetFilters={() => { }}
+            />
 
             <div className="w-full max-w-screen min-h-screen">
                 {product && (

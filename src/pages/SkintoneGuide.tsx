@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Info, Scissors, Palette } from 'lucide-react';
-import Navbar from '../Components/Navbar';
+import { ChevronDown, ChevronUp, Scissors, Palette } from 'lucide-react';
+import Navbar from '../components/Navbar';
 
 // Type definitions
 interface ColorSwatch {
@@ -60,6 +60,8 @@ const SkintoneGuide: React.FC = () => {
         deep: false,
         tips: false
     });
+
+    const [products, setProducts] = useState([])
 
     // Toggle function for collapsible sections
     const toggleSection = (section: keyof ExpandedSections): void => {
@@ -459,7 +461,11 @@ const SkintoneGuide: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-rose to-purple-100 pb-8 pt-20 px-4">
-            <Navbar />
+            <Navbar
+                products={products}
+                setFilteredProducts={() => { }}
+                resetFilters={() => { }}
+            />
             <div className="max-w-6xl mx-auto">
                 <header className="text-center mb-10 bg-white bg-opacity-60 rounded-2xl p-6 shadow-lg">
                     <h1 className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-wine to-lightLavender mb-3">

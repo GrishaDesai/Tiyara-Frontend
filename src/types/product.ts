@@ -1,5 +1,6 @@
 export interface Product {
-    _id: number;
+    _id: string;
+    Product_id: number;
     URL: string;
     Category: string;
     image_url: string;
@@ -9,14 +10,19 @@ export interface Product {
     DiscountPrice: number;
     OriginalPrice: number;
     DiscountOffer: string;
-    SizeOption: string; // e.g., "S, M, L, XL, XXL"
+    SizeOption: string;
     Ratings: number;
     Reviews: number;
-    tags: string; // Can be split into string[] if needed
+    tags: string;
+}
+
+export interface ProductWithScore {
+    product: Product;
+    score: number;
 }
 
 export interface ImageRecommendation {
-    productId: string;   // changed from url → productId
+    productId: string;
     score: number;
 }
 

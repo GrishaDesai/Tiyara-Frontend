@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchImageRecommendations } from "../apis/products";
 import { Star, Upload, Camera, Sparkles, ShoppingBag } from "lucide-react";
+import type { Product, ProductWithScore } from "../types/product";
 
 // Loader Component
 const Loader = () => (
@@ -19,7 +20,7 @@ const Loader = () => (
 );
 
 // Image Preview Component
-const ImagePreview = ({ preview }) =>
+const ImagePreview = ({ preview }: { preview: string | null }) =>
     preview ? (
         <div className="mb-10 flex justify-center animate-fade-in">
             <div className="text-center">
@@ -40,7 +41,17 @@ const ImagePreview = ({ preview }) =>
     ) : null;
 
 // Product Card Component
-const ProductCard = ({ product, score, index, onClick }) => (
+const ProductCard = ({
+    product,
+    score,
+    index,
+    onClick,
+}: {
+    product: Product;
+    score: number;
+    index: number;
+    onClick: () => void;
+}) => (
     <div
         className="bg-ivory shadow-lg rounded-2xl overflow-hidden cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-rose/20 group border border-moonstone hover:border-rose animate-slide-up"
         style={{ animationDelay: `${index * 100}ms` }}
@@ -91,21 +102,22 @@ const ProductCard = ({ product, score, index, onClick }) => (
 );
 
 const ImageRecommender = () => {
-    const [file, setFile] = useState(null);
-    const [preview, setPreview] = useState(null);
-    const [recommendations, setRecommendations] = useState([]);
+    const [file, setFile] = useState<File | null>(null);
+    const [preview, setPreview] = useState<string | null>(null);
+    const [recommendations, setRecommendations] = useState<ProductWithScore[]>([]);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
-    const handleFileChange = (e) => {
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
             const selectedFile = e.target.files[0];
             setFile(selectedFile);
 
-            // Create preview
             const reader = new FileReader();
             reader.onload = (e) => {
-                setPreview(e.target.result);
+                if (e.target && typeof e.target.result === "string") {
+                    setPreview(e.target.result);
+                }
             };
             reader.readAsDataURL(selectedFile);
         }
@@ -226,7 +238,7 @@ const ImageRecommender = () => {
                 )}
             </div>
 
-            <style jsx>{`
+            <style>{`
                 @keyframes fade-in {
                     from { opacity: 0; transform: translateY(20px); }
                     to { opacity: 1; transform: translateY(0); }
