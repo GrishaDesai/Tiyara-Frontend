@@ -1,24 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import type { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Loader from '../components/Loader';
 import { fetchCategories } from '../apis/categories';
-import type { Result } from '../types/result'; 
+import type { Result } from '../types/result';
 import type { IndividualCategory } from "../types/individualCategory";
-
 
 const AllCategories: FC = () => {
   const [products, setProducts] = useState<IndividualCategory[]>([]);
-  const [isLoading, setIsLoading] = useState < boolean > (false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const loadProducts = async () => {
       try {
         setIsLoading(true);
-        const response: Result = await fetchCategories();
-        console.log( "response data ", response.data);
+        const response: Result<IndividualCategory[]> = await fetchCategories();
+        console.log("response data ", response.data);
         setProducts(response.data || []);
       } catch (err) {
         console.error(err);
@@ -30,16 +29,18 @@ const AllCategories: FC = () => {
     loadProducts();
   }, []);
 
-  // Render loader if data is not yet available
   if (isLoading) {
     return <Loader />;
   }
 
   return (
     <div className="container mx-auto p-6">
-      <Navbar />
+      <Navbar
+        products={[]}
+        setFilteredProducts={() => {}}
+        resetFilters={() => {}}
+      />
       <h2 className="text-2xl font-semibold mb-4 text-gray-800 mt-12 flex justify-center">Categories</h2>
-
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {products.map((item, index) => (
@@ -59,7 +60,6 @@ const AllCategories: FC = () => {
           </div>
         ))}
       </div>
-
     </div>
   );
 };

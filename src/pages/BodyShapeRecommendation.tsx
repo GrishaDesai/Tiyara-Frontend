@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import type { Product } from '../types/product'
 import type { Recommendation } from '../types/bodyshape'

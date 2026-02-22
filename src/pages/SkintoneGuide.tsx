@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp, Scissors, Palette } from 'lucide-react';
 import Navbar from '../components/Navbar';
+import type { Product } from '../types/product';
 
 // Type definitions
 interface ColorSwatch {
@@ -61,8 +62,7 @@ const SkintoneGuide: React.FC = () => {
         tips: false
     });
 
-    const [products, setProducts] = useState([])
-
+    const products: Product[] = [];
     // Toggle function for collapsible sections
     const toggleSection = (section: keyof ExpandedSections): void => {
         setExpandedSections((prev) => ({

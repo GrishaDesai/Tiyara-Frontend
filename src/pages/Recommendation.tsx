@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { fetchRecommendations } from "../apis/products";
 import type { Product } from "../types/product";
@@ -11,7 +11,7 @@ export default function RecommendationPage() {
     const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
     const [error, setError] = useState<string>("");
     const [isLoading, setIsLoading] = useState(false);
-    const [products, setProducts] = useState<Product[]>([]);
+    const products: Product[] = [];
 
     const param = useParams<{ id: string }>();
     const navigate = useNavigate();

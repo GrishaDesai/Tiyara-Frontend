@@ -7,13 +7,14 @@ import { useNavigate } from "react-router-dom"
 import Navbar from "../components/Navbar"
 import { predictSkinTone, type SkinToneData } from "../apis/skintone"
 import type { Result } from "../types/result"
+import type { Product } from "../types/product"
 
 export default function SkintoneDemo() {
     const [isExpanded, setIsExpanded] = useState(false)
     const [selectedImage, setSelectedImage] = useState<File | null>(null)
     const [response, setResponse] = useState<Result<SkinToneData> | null>(null)
     const [isLoading, setIsLoading] = useState(false)
-    const [products, setProducts] = useState([])
+    const products: Product[] = [];
     const navigate = useNavigate()
 
     const toggleLogin = () => {

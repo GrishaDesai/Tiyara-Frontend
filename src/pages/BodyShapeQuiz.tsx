@@ -1,7 +1,7 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import placeholder from "../../src/assets/image/collage4.webp";
-import type{
+import type {
     QuizAnswers,
     BodyShapeDetails,
 } from "../types/bodyshape";
@@ -40,8 +40,6 @@ const BodyShapeQuiz: React.FC = () => {
         try {
             const data = await submitBodyShapeQuiz(answers);
 
-            // console.log("data - ", data);
-            
             if (data.error) {
                 throw new Error(data.message || "Failed to classify body shape");
             }
@@ -50,8 +48,8 @@ const BodyShapeQuiz: React.FC = () => {
                 setResult(data.data.bodyShape);
                 setDetails(data.data.details);
             }
-        } catch (err: any) {
-            setError(err.message || "Failed to classify body shape. Please try again.");
+        } catch (err: unknown) {
+            setError((err as Error).message || "Failed to classify body shape. Please try again.");
         }
     };
 
@@ -63,11 +61,7 @@ const BodyShapeQuiz: React.FC = () => {
 
         try {
             setError(null);
-            // console.log("result - ", result);
-            
             const data = await fetchBodyShapeRecommendations(result);
-            // console.log("data quiz - ", data);
-            
             if (data) {
                 navigate("/body-shape/recommendations", {
                     state: {
@@ -77,8 +71,8 @@ const BodyShapeQuiz: React.FC = () => {
                     },
                 });
             }
-        } catch (err: any) {
-            setError(err.message || "Failed to fetch recommendations. Please try again.");
+        } catch (err: unknown) {
+            setError((err as Error).message || "Failed to fetch recommendations. Please try again.");
         }
     };
 
@@ -99,11 +93,7 @@ const BodyShapeQuiz: React.FC = () => {
                                     <label className="block text-plum font-semibold text-xs sm:text-sm">
                                         What is the widest part of your body?
                                     </label>
-                                    <select
-                                        name="widestPart"
-                                        onChange={handleChange}
-                                        className="w-full p-2 sm:p-3 bg-moonstone border border-mauve rounded-lg text-plum focus:ring-2 focus:ring-lavender focus:border-transparent transition-all text-sm sm:text-base"
-                                    >
+                                    <select name="widestPart" onChange={handleChange} className="w-full p-2 sm:p-3 bg-moonstone border border-mauve rounded-lg text-plum focus:ring-2 focus:ring-lavender focus:border-transparent transition-all text-sm sm:text-base">
                                         <option value="">Select an option</option>
                                         <option value="bust">I'm all bust</option>
                                         <option value="middle">I'm full in the middle</option>
@@ -117,11 +107,7 @@ const BodyShapeQuiz: React.FC = () => {
                                     <label className="block text-plum font-semibold text-xs sm:text-sm">
                                         Is your waist well-defined?
                                     </label>
-                                    <select
-                                        name="waistDefined"
-                                        onChange={handleChange}
-                                        className="w-full p-2 sm:p-3 bg-moonstone border border-mauve rounded-lg text-plum focus:ring-2 focus:ring-lavender focus:border-transparent transition-all text-sm sm:text-base"
-                                    >
+                                    <select name="waistDefined" onChange={handleChange} className="w-full p-2 sm:p-3 bg-moonstone border border-mauve rounded-lg text-plum focus:ring-2 focus:ring-lavender focus:border-transparent transition-all text-sm sm:text-base">
                                         <option value="">Select an option</option>
                                         <option value="yes">Yes</option>
                                         <option value="no">No</option>
@@ -134,11 +120,7 @@ const BodyShapeQuiz: React.FC = () => {
                                     <label className="block text-plum font-semibold text-xs sm:text-sm">
                                         How would you describe your hips?
                                     </label>
-                                    <select
-                                        name="hipsDescription"
-                                        onChange={handleChange}
-                                        className="w-full p-2 sm:p-3 bg-moonstone border border-mauve rounded-lg text-plum focus:ring-2 focus:ring-lavender focus:border-transparent transition-all text-sm sm:text-base"
-                                    >
+                                    <select name="hipsDescription" onChange={handleChange} className="w-full p-2 sm:p-3 bg-moonstone border border-mauve rounded-lg text-plum focus:ring-2 focus:ring-lavender focus:border-transparent transition-all text-sm sm:text-base">
                                         <option value="">Select an option</option>
                                         <option value="wider">Wider than bust and shoulders</option>
                                         <option value="equal">Bust and hips are fairly equal</option>
@@ -151,11 +133,7 @@ const BodyShapeQuiz: React.FC = () => {
                                     <label className="block text-plum font-semibold text-xs sm:text-sm">
                                         Do you have broad shoulders?
                                     </label>
-                                    <select
-                                        name="broadShoulders"
-                                        onChange={handleChange}
-                                        className="w-full p-2 sm:p-3 bg-moonstone border border-mauve rounded-lg text-plum focus:ring-2 focus:ring-lavender focus:border-transparent transition-all text-sm sm:text-base"
-                                    >
+                                    <select name="broadShoulders" onChange={handleChange} className="w-full p-2 sm:p-3 bg-moonstone border border-mauve rounded-lg text-plum focus:ring-2 focus:ring-lavender focus:border-transparent transition-all text-sm sm:text-base">
                                         <option value="">Select an option</option>
                                         <option value="yes">Yes</option>
                                         <option value="no">No</option>
@@ -167,11 +145,7 @@ const BodyShapeQuiz: React.FC = () => {
                                     <label className="block text-plum font-semibold text-xs sm:text-sm">
                                         Where do you notice your weight changes first?
                                     </label>
-                                    <select
-                                        name="weightChange"
-                                        onChange={handleChange}
-                                        className="w-full p-2 sm:p-3 bg-moonstone border border-mauve rounded-lg text-plum focus:ring-2 focus:ring-lavender focus:border-transparent transition-all text-sm sm:text-base"
-                                    >
+                                    <select name="weightChange" onChange={handleChange} className="w-full p-2 sm:p-3 bg-moonstone border border-mauve rounded-lg text-plum focus:ring-2 focus:ring-lavender focus:border-transparent transition-all text-sm sm:text-base">
                                         <option value="">Select an option</option>
                                         <option value="upper">Upper body (arms, shoulders, back)</option>
                                         <option value="hips">Hips and thighs</option>
@@ -185,11 +159,7 @@ const BodyShapeQuiz: React.FC = () => {
                                     <label className="block text-plum font-semibold text-xs sm:text-sm">
                                         Has your build ever been described as athletic?
                                     </label>
-                                    <select
-                                        name="athleticBuild"
-                                        onChange={handleChange}
-                                        className="w-full p-2 sm:p-3 bg-moonstone border border-mauve rounded-lg text-plum focus:ring-2 focus:ring-lavender focus:border-transparent transition-all text-sm sm:text-base"
-                                    >
+                                    <select name="athleticBuild" onChange={handleChange} className="w-full p-2 sm:p-3 bg-moonstone border border-mauve rounded-lg text-plum focus:ring-2 focus:ring-lavender focus:border-transparent transition-all text-sm sm:text-base">
                                         <option value="">Select an option</option>
                                         <option value="no">No</option>
                                         <option value="yes">Yes</option>
@@ -201,11 +171,7 @@ const BodyShapeQuiz: React.FC = () => {
                                     <label className="block text-plum font-semibold text-xs sm:text-sm">
                                         How would you describe your derriere?
                                     </label>
-                                    <select
-                                        name="derriere"
-                                        onChange={handleChange}
-                                        className="w-full p-2 sm:p-3 bg-moonstone border border-mauve rounded-lg text-plum focus:ring-2 focus:ring-lavender focus:border-transparent transition-all text-sm sm:text-base"
-                                    >
+                                    <select name="derriere" onChange={handleChange} className="w-full p-2 sm:p-3 bg-moonstone border border-mauve rounded-lg text-plum focus:ring-2 focus:ring-lavender focus:border-transparent transition-all text-sm sm:text-base">
                                         <option value="">Select an option</option>
                                         <option value="small">Small, yet mighty</option>
                                         <option value="full">My trunk is full</option>
@@ -218,11 +184,7 @@ const BodyShapeQuiz: React.FC = () => {
                                     <label className="block text-plum font-semibold text-xs sm:text-sm">
                                         How would you describe your bust?
                                     </label>
-                                    <select
-                                        name="bustSize"
-                                        onChange={handleChange}
-                                        className="w-full p-2 sm:p-3 bg-moonstone border border-mauve rounded-lg text-plum focus:ring-2 focus:ring-lavender focus:border-transparent transition-all text-sm sm:text-base"
-                                    >
+                                    <select name="bustSize" onChange={handleChange} className="w-full p-2 sm:p-3 bg-moonstone border border-mauve rounded-lg text-plum focus:ring-2 focus:ring-lavender focus:border-transparent transition-all text-sm sm:text-base">
                                         <option value="">Select an option</option>
                                         <option value="small">On the smaller side</option>
                                         <option value="large">Large and busty</option>
@@ -258,28 +220,17 @@ const BodyShapeQuiz: React.FC = () => {
                                 <h1 className="text-3xl font-bold text-wine mb-4 text-center">{details.name}</h1>
                                 <p className="text-plum text-lg mb-6 text-center">{details.description}</p>
                                 <div className="w-full max-w-md flex justify-center">
-                                    <img
-                                        src={details.image}
-                                        alt={details.name}
-                                        className="w-3/4 h-96 object-fill rounded-lg mb-6 shadow-md"
-                                    />
+                                    <img src={details.image} alt={details.name} className="w-3/4 h-96 object-fill rounded-lg mb-6 shadow-md" />
                                 </div>
 
                                 {details.recommendations && (
                                     <div className="space-y-6 w-full">
                                         <h2 className="text-2xl font-semibold text-lavender mb-4">Style Recommendations</h2>
                                         {details.recommendations.map((item, index) => (
-                                            <div
-                                                key={index}
-                                                className="bg-moonstone p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
-                                            >
+                                            <div key={index} className="bg-moonstone p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
                                                 <h3 className="text-xl font-semibold text-wine">{item.name}</h3>
                                                 <p className="text-plum mt-2">{item.description}</p>
-                                                <img
-                                                    src={item.image}
-                                                    alt={item.name}
-                                                    className="w-full object-cover rounded-md mt-4"
-                                                />
+                                                <img src={item.image} alt={item.name} className="w-full object-cover rounded-md mt-4" />
                                             </div>
                                         ))}
                                         <button
@@ -294,11 +245,7 @@ const BodyShapeQuiz: React.FC = () => {
                             </div>
                         ) : (
                             <div className="overflow-hidden">
-                                <img
-                                    src={placeholder}
-                                    alt="placeholder"
-                                    className="w-full h-[50vh] sm:h-[70vh] md:h-[90vh] object-cover"
-                                />
+                                <img src={placeholder} alt="placeholder" className="w-full h-[50vh] sm:h-[70vh] md:h-[90vh] object-cover" />
                             </div>
                         )}
                     </div>
