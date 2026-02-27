@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import flower from "../assets/svg/flower2.svg";
 import model1 from "../assets/image/model1.png";
 import model2 from "../assets/image/model3.png";
@@ -20,6 +20,7 @@ import { useNavigate } from "react-router-dom";
 import bodyshape from "../assets/image/bodyshape1-removebg-preview.png";
 import bodyshapeBg1 from "../assets/image/bodyshape-bg5.png";
 import Footer from "../components/Footer";
+import Chatbot from "../components/Chatbot";
 import skintonebg from "../assets/image/skintonebg.png";
 import Loader from "../components/Loader";
 import { fetchMainCategories } from '../apis/categories';
@@ -309,6 +310,7 @@ export default function Home() {
         {/* Footer */}
         <Footer />
       </div>
+      <Chatbot />
     </div>
   );
 }
