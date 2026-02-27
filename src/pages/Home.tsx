@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import flower from "../assets/svg/flower2.svg";
 import model1 from "../assets/image/model1.png";
 import model2 from "../assets/image/model3.png";
