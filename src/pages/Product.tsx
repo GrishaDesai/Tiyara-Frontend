@@ -5,6 +5,7 @@ import { fetchProductsByCategory } from "../apis/categories";
 import Navbar from "../components/Navbar";
 import Loader from "../components/Loader";
 import Sidebar from "../components/Sidebar";
+import { AddToCartButton, WishlistButton } from "../components/Cartbuttons";
 
 export default function Product() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -80,36 +81,51 @@ export default function Product() {
             ) : (
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                  {currentProducts.map((product) => (
-                    <div
-                      key={product.Product_id}
-                      className="bg-white shadow-lg rounded-sm overflow-hidden cursor-pointer"
-                      onClick={() => navigate(`/recommend/${product.Product_id}`)}
-                    >
-                      <img src={product.image_url} alt={product.BrandName} className="w-full object-fill" />
-                      <div className="flex items-center space-x-1 p-2">
-                        <span className="bg-green-100 text-green-700 text-sm font-semibold px-2 py-1 rounded">
-                          {product.Ratings} ★
-                        </span>
-                        <span className="text-gray-500 text-sm">({product.Reviews})</span>
-                      </div>
-                      <div className="p-2">
-                        <h3 className="font-semibold text-lg">{product.BrandName}</h3>
-                        <p className="text-gray-500 text-sm">{product.Individual_category}</p>
-                        <div className="mt-2 flex flex-col md:flex-row items-center md:justify-around">
-                          <div className="flex justify-between items-center w-3/5">
-                            <span className="text-lg font-bold text-gray-900">Rs. {product.OriginalPrice}</span>
-                            <span className="text-gray-400 line-through">Rs. {product.OriginalPrice}</span>
-                          </div>
-                          <div className="flex items-center">
-                            <span className="text-red-500 font-semibold">
-                              ({product.DiscountOffer})
+                    {currentProducts.map((product) => (
+                      <div
+                        key={product.Product_id}
+                        className="bg-white shadow-lg rounded-sm overflow-hidden cursor-pointer relative"
+                      >
+                        {/* Wishlist button - top right of image */}
+                        <div
+                          className="absolute top-2 right-2 z-10 bg-white rounded-full p-1 shadow"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <WishlistButton productId={product.Product_id} />
+                        </div>
+
+                        {/* Card click → navigate */}
+                        <div onClick={() => navigate(`/recommend/${product.Product_id}`)}>
+                          <img src={product.image_url} alt={product.BrandName} className="w-full object-fill" />
+
+                          <div className="flex items-center space-x-1 p-2">
+                            <span className="bg-green-100 text-green-700 text-sm font-semibold px-2 py-1 rounded">
+                              {product.Ratings} ★
                             </span>
+                            <span className="text-gray-500 text-sm">({product.Reviews})</span>
+                          </div>
+
+                          <div className="p-2">
+                            <h3 className="font-semibold text-lg">{product.BrandName}</h3>
+                            <p className="text-gray-500 text-sm">{product.Individual_category}</p>
+                            <div className="mt-2 flex flex-col md:flex-row items-center md:justify-around">
+                              <div className="flex justify-between items-center w-3/5">
+                                <span className="text-lg font-bold text-gray-900">Rs. {product.OriginalPrice}</span>
+                                <span className="text-gray-400 line-through">Rs. {product.OriginalPrice}</span>
+                              </div>
+                              <div className="flex items-center">
+                                <span className="text-red-500 font-semibold">({product.DiscountOffer})</span>
+                              </div>
+                            </div>
                           </div>
                         </div>
+
+                        {/* Add to Cart button - bottom, stops propagation */}
+                        <div className="px-2 pb-3" onClick={(e) => e.stopPropagation()}>
+                          <AddToCartButton productId={product.Product_id} className="w-full" />
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
                 </div>
 
                 {/* Pagination */}

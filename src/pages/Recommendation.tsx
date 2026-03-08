@@ -5,6 +5,7 @@ import type { Product } from "../types/product";
 import type { Recommendation } from "../types/product";
 import Navbar from "../components/Navbar";
 import Loader from "../components/Loader";
+import { AddToCartButton, WishlistButton } from "../components/Cartbuttons";
 
 export default function RecommendationPage() {
     const [product, setProduct] = useState<Product | null>(null);
@@ -57,6 +58,7 @@ export default function RecommendationPage() {
             <div className="w-full max-w-screen min-h-screen">
                 {product && (
                     <div className="w-full bg-white p-8 rounded-xl shadow-lg flex flex-col md:flex-row gap-8 max-w-6xl mx-auto">
+
                         {/* Product Image */}
                         <div className="w-full md:w-1/2">
                             <img
@@ -113,12 +115,15 @@ export default function RecommendationPage() {
 
                             {/* Buttons */}
                             <div className="mt-8 flex flex-col sm:flex-row gap-4">
-                                <button className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg font-semibold flex-1 transition-colors">
-                                    ADD TO BAG
-                                </button>
-                                <button className="border-2 border-wine text-wine hover:border-gray-800 px-6 py-3 rounded-lg font-semibold flex-1 transition-colors">
-                                    WISHLIST
-                                </button>
+                                <AddToCartButton
+                                    productId={product.Product_id}
+                                    className="flex-1 py-3 text-base font-semibold rounded-lg"
+                                />
+                                <WishlistButton
+                                    productId={product.Product_id}
+                                    showLabel
+                                    className="flex-1 justify-center border-2 border-wine rounded-lg py-3 font-semibold hover:bg-blush transition-colors"
+                                />
                             </div>
 
                             {/* Product Link */}

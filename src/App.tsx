@@ -23,6 +23,8 @@ import Price from './pages/Price';
 import Recommendation from './pages/Recommendation';
 import SkintoneDemo from './pages/SkintoneDemo';
 import SkintoneGuide from './pages/SkintoneGuide';
+import WishlistPage from './components/Wishlistpage';
+import CartPage from './components/Cartpage';
 // import BodyShapeRecommendation from './Screen/BodyShapeRecommendation';
 // import SkintoneDetection from './Screen/SkintoneDetection';
 // import SkintoneDemo from './Screen/SkintoneDemo';
@@ -51,6 +53,8 @@ function App() {
         <Route path='/recommend/:id' element={<Recommendation />} />
         <Route path='/skintone-demo' element={<SkintoneDemo />} />
         <Route path='/skintone-guide' element={<SkintoneGuide />} />
+        <Route path="/cart" element={<CartPage />} />
+        <Route path="/wishlist" element={<WishlistPage />} />
 
       </Routes>
     </BrowserRouter>

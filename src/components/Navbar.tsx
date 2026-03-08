@@ -1,9 +1,12 @@
-import { useState, useEffect } from 'react';
-import type { FC, ChangeEvent, MouseEvent } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import type { FC, ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, X, Camera } from 'lucide-react';
+import { Search, X, Camera, ShoppingBag, Heart, User, LogOut, ChevronDown } from 'lucide-react';
 import logo from '../assets/image/logo.png';
 import type { Product } from '../types/product';
+import { useAuth, useCart } from '../hooks/useStore';
+import { useAuthModal } from '../hooks/useAuthModal';
+import AuthModal from './Authmodal';
 
 export interface NavbarProps {
   products?: Product[] | null;
@@ -12,127 +15,64 @@ export interface NavbarProps {
 }
 
 const Navbar: FC<NavbarProps> = ({ products, setFilteredProducts, resetFilters }) => {
-  const [scrolled, setScrolled] = useState<boolean>(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
-  const [searchTerm, setSearchTerm] = useState<string>('');
-  const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const { user, isAuthenticated, logout } = useAuth();
+  const { cartCount, wishlistItems } = useCart();
   const navigate = useNavigate();
 
-  // Scroll effect for navbar
+  const { authModal, openAuth, closeAuth } = useAuthModal();
+
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Search functionality
+  useEffect(() => {
+    const handler = (e: Event) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
   const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchTerm(value);
+    if (!value.trim()) { setFilteredProducts?.(products || []); return; }
+    if (!products || !Array.isArray(products)) { setFilteredProducts?.(products || []); return; }
 
-    console.log('Search term:', value);
-
-    // If search term is empty, reset to all products
-    if (!value.trim()) {
-      console.log('Empty search, resetting to all products');
-      if (setFilteredProducts) {
-        setFilteredProducts(products || []);
-      }
-      return;
-    }
-
-    // Ensure products array exists
-    if (!products || !Array.isArray(products)) {
-      console.log('Products array is invalid or empty');
-      if (setFilteredProducts) {
-        setFilteredProducts(products || []);
-      }
-      return;
-    }
-
-    // Helper function to normalize text
-    const normalize = (str: string | undefined): string => {
-      if (!str) return '';
-      return str
-        .toLowerCase()
-        .replace(/\s+/g, ' ') // Normalize spaces
-        .replace(/\bt[\s-]*shirt\b/gi, 'tshirt') // Handle t-shirt, t shirt, etc.
-        .replace(/\btops\b/gi, 'top') // Handle tops -> top
-        .replace(/\btshirts\b/gi, 'tshirt') // Handle tshirts -> tshirt
+    const normalize = (str?: string) =>
+      (str || '').toLowerCase()
+        .replace(/\s+/g, ' ')
+        .replace(/\bt[\s-]*shirt\b/gi, 'tshirt')
+        .replace(/\btops\b/gi, 'top')
+        .replace(/\btshirts\b/gi, 'tshirt')
         .trim();
-    };
 
-    // Normalize and split search terms
-    const searchWords = normalize(value)
-      .split(' ')
-      .filter((word) => word); // Remove empty words
-    console.log('Normalized search words:', searchWords);
-
-    // Filter products
-    let filtered = [...products]; // Create a copy of products array
-
-    filtered = filtered.filter((product) => {
-      // Normalize product fields with null checks
-      const tagsText = product?.tags ? normalize(product.tags) : '';
-
-      // Combine all searchable text and ensure it's lowercase
-      console.log('Product text:', tagsText);
-
-      // Check if at least one search word is found in the combined text
-      const hasMatch = searchWords.some((word) => {
-        const matches = tagsText.includes(word);
-        console.log(`Checking word "${word}" in "${tagsText}": ${matches}`);
-        return matches;
-      });
-
-      return hasMatch;
-    });
-
-    console.log('Filtered products:', filtered);
-    if (setFilteredProducts) {
-      setFilteredProducts(products || []);
-    }
+    const searchWords = normalize(value).split(' ').filter(Boolean);
+    const filtered = products.filter(p =>
+      searchWords.some(w => normalize(p?.tags).includes(w))
+    );
+    setFilteredProducts?.(filtered);
   };
 
-  // Clear search
-  const handleClearSearch = () => {
-    setSearchTerm('');
-    resetFilters?.();
-  };
+  const handleClearSearch = () => { setSearchTerm(''); resetFilters?.(); };
+  const handleLogout = () => { logout(); setUserMenuOpen(false); navigate('/'); };
 
-  // Toggle mobile menu
-  const toggleMobileMenu = () => {
-    setMobileMenuOpen((prev) => !prev);
-  };
-
-  // Handle image upload popup
-  const openPopup = () => {
-    setIsPopupOpen(true);
-  };
-
-  const closePopup = () => {
-    setIsPopupOpen(false);
-    setSelectedFile(null);
-  };
-
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setSelectedFile(e.target.files ? e.target.files[0] : null);
-  };
-
-  const handleUpload = (e: MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    if (!selectedFile) {
-      alert('Please select an image to upload.');
-      return;
-    }
-
-    // Pass the selected file to the img-rec component via navigation state
-    navigate('/image-rec', { state: { imageFile: selectedFile } });
-    closePopup();
-  };
+  const navLinks = [
+    { name: 'Home', link: '/' },
+    { name: 'Products', link: '/product' },
+    { name: 'Categories', link: '/category' },
+    { name: 'Contact', link: '/' },
+  ];
 
   return (
     <>
@@ -141,38 +81,23 @@ const Navbar: FC<NavbarProps> = ({ products, setFilteredProducts, resetFilters }
           }`}
         style={{ height: '4rem' }}
       >
-        {/* Left: Logo */}
+        {/* Logo */}
         <div className="flex items-center">
-          <img
-            src={logo}
-            alt="Logo"
-            className="h-12 w-auto"
-            onClick={() => navigate('/')}
-          />
+          <img src={logo} alt="Logo" className="h-12 w-auto cursor-pointer" onClick={() => navigate('/')} />
         </div>
 
-        {/* Desktop Menu - Hidden on mobile */}
+        {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-10 flex-grow justify-center">
           <ul className="flex items-center gap-8 text-lg text-wine font-medium">
-            {[
-              { name: 'Home', link: '/' },
-              { name: 'Products', link: '/product' },
-              { name: 'Categories', link: '/category' },
-              { name: 'Contact', link: '/' },
-            ].map((item, index) => (
-              <li key={index} className="relative group">
-                <a
-                  href={item.link}
-                  className="hover:text-gray-300 transition-all duration-300"
-                >
-                  {item.name}
-                </a>
-                <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-ivory transition-all duration-300 group-hover:w-full"></span>
+            {navLinks.map((item, i) => (
+              <li key={i} className="relative group">
+                <a href={item.link} className="hover:text-gray-300 transition-all duration-300">{item.name}</a>
+                <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-ivory transition-all duration-300 group-hover:w-full" />
               </li>
             ))}
           </ul>
 
-          {/* Search Bar - Shown on medium+ screens */}
+          {/* Search */}
           <div className="hidden lg:flex items-center justify-between border rounded-lg border-wine px-2 py-2 w-64 xl:w-80 focus-within:border-wine">
             <Search className="text-wine mr-2" size={18} />
             <input
@@ -184,160 +109,149 @@ const Navbar: FC<NavbarProps> = ({ products, setFilteredProducts, resetFilters }
             />
             <div className="flex gap-2">
               {searchTerm && (
-                <button
-                  className="text-wine hover:text-gray-600 transition-all"
-                  onClick={handleClearSearch}
-                >
+                <button className="text-wine hover:text-gray-600" onClick={handleClearSearch}>
                   <X size={18} />
                 </button>
               )}
+              {/* Camera — directly navigate to image-rec */}
               <button
-                className="text-wine hover:text-gray-600 transition-all"
-                onClick={openPopup}
+                className="text-wine hover:text-gray-600"
+                onClick={() => navigate('/image-rec')}
+                title="Search by image"
               >
                 <Camera size={18} />
               </button>
-
             </div>
           </div>
         </div>
 
-        {/* Right: Login & Signup Buttons - Hidden on mobile */}
-        <div className="hidden md:flex gap-3 lg:gap-5">
-          <button className="px-3 lg:px-5 py-2 border border-wine text-wine rounded-md hover:bg-wine hover:text-white transition-all text-sm lg:text-base">
-            Login
-          </button>
-          <button className="px-3 lg:px-5 py-2 bg-wine text-white rounded-md hover:bg-opacity-80 transition-all text-sm lg:text-base">
-            Signup
-          </button>
+        {/* Right actions */}
+        <div className="hidden md:flex items-center gap-3 lg:gap-4">
+          {isAuthenticated ? (
+            <>
+              <button className="relative text-wine hover:text-wine/70 transition-colors" onClick={() => navigate('/wishlist')}>
+                <Heart size={22} />
+                {wishlistItems.length > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 bg-wine text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                    {wishlistItems.length}
+                  </span>
+                )}
+              </button>
+
+              <button className="relative text-wine hover:text-wine/70 transition-colors" onClick={() => navigate('/cart')}>
+                <ShoppingBag size={22} />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 bg-wine text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                    {cartCount > 99 ? '99+' : cartCount}
+                  </span>
+                )}
+              </button>
+
+              <div className="relative" ref={userMenuRef}>
+                <button
+                  onClick={() => setUserMenuOpen(p => !p)}
+                  className="flex items-center gap-1.5 border border-wine text-wine rounded-md px-3 py-1.5 text-sm hover:bg-wine hover:text-white transition-all"
+                >
+                  <User size={15} />
+                  <span className="max-w-[80px] truncate">{user?.name?.split(' ')[0]}</span>
+                  <ChevronDown size={13} />
+                </button>
+                {userMenuOpen && (
+                  <div className="absolute right-0 top-full mt-2 bg-white rounded-xl shadow-lg border border-gray-100 py-2 w-44 z-50">
+                    <button onClick={() => { navigate('/profile'); setUserMenuOpen(false); }} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blush hover:text-wine transition-colors flex items-center gap-2">
+                      <User size={14} /> Profile
+                    </button>
+                    <button onClick={() => { navigate('/wishlist'); setUserMenuOpen(false); }} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blush hover:text-wine transition-colors flex items-center gap-2">
+                      <Heart size={14} /> Wishlist
+                    </button>
+                    <button onClick={() => { navigate('/cart'); setUserMenuOpen(false); }} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blush hover:text-wine transition-colors flex items-center gap-2">
+                      <ShoppingBag size={14} /> Cart
+                    </button>
+                    <hr className="my-1 border-gray-100" />
+                    <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-50 transition-colors flex items-center gap-2">
+                      <LogOut size={14} /> Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            </>
+          ) : (
+            <>
+              <button onClick={() => openAuth('login')} className="px-3 lg:px-5 py-2 border border-wine text-wine rounded-md hover:bg-wine hover:text-white transition-all text-sm lg:text-base">
+                Login
+              </button>
+              <button onClick={() => openAuth('signup')} className="px-3 lg:px-5 py-2 bg-wine text-white rounded-md hover:bg-opacity-80 transition-all text-sm lg:text-base">
+                Signup
+              </button>
+            </>
+          )}
         </div>
 
-        {/* Mobile Menu Button - Only visible on mobile */}
-        <button
-          className="md:hidden text-wine text-2xl p-2"
-          onClick={toggleMobileMenu}
-          aria-label="Toggle mobile menu"
-        >
-          {mobileMenuOpen ? <span>✕</span> : <span>☰</span>}
+        {/* Mobile hamburger */}
+        <button className="md:hidden text-wine text-2xl p-2" onClick={() => setMobileMenuOpen(p => !p)}>
+          {mobileMenuOpen ? '✕' : '☰'}
         </button>
       </nav>
 
-      {/* Mobile Menu - Slide in from right */}
-      <div
-        className={`fixed top-16 right-0 h-screen w-full md:w-64 bg-blush shadow-lg transform transition-transform duration-300 ease-in-out z-40 ${mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
-          }`}
-      >
+      {/* Mobile Menu */}
+      <div className={`fixed top-16 right-0 h-screen w-full md:w-64 bg-blush shadow-lg transform transition-transform duration-300 ease-in-out z-40 ${mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
         <div className="flex flex-col p-5">
-          {/* Mobile Navigation Links */}
           <ul className="flex flex-col space-y-4 mb-6">
-            {[
-              { name: 'Home', link: '/' },
-              { name: 'Products', link: '/allProducts' },
-              { name: 'Categories', link: '/category' },
-              { name: 'Contact', link: '/' },
-            ].map((item, index) => (
-              <li key={index}>
-                <a
-                  href={item.link}
-                  className="text-wine text-lg font-medium block py-2 hover:text-gray-300 transition-all"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
+            {navLinks.map((item, i) => (
+              <li key={i}>
+                <a href={item.link} className="text-wine text-lg font-medium block py-2 hover:text-gray-300 transition-all" onClick={() => setMobileMenuOpen(false)}>
                   {item.name}
                 </a>
               </li>
             ))}
           </ul>
 
-          {/* Mobile Search */}
-          <div className="flex items-center justify-between border rounded-lg border-wine px-2 py-2 w-full mb-6 focus-within:border-wine">
+          <div className="flex items-center justify-between border rounded-lg border-wine px-2 py-2 w-full mb-6">
             <Search className="text-wine mr-2" size={18} />
             <input
               type="text"
-              placeholder="Search products, brands, or tags..."
+              placeholder="Search..."
               className="bg-transparent text-wine placeholder-gray-500 focus:outline-none w-full"
               value={searchTerm}
               onChange={handleSearch}
             />
-            <div className="flex gap-2">
-              {searchTerm && (
-                <button
-                  className="text-wine hover:text-gray-600 transition-all"
-                  onClick={handleClearSearch}
-                >
-                  <X size={18} />
-                </button>
-              )}
-              <button
-                className="text-wine hover:text-gray-600 transition-all"
-                onClick={openPopup}
-              >
-                <i className="fa fa-camera" aria-hidden="true"></i>
-              </button>
-            </div>
+            {searchTerm && <button className="text-wine" onClick={handleClearSearch}><X size={18} /></button>}
+            {/* Camera — directly navigate to image-rec */}
+            <button
+              className="text-wine ml-1"
+              onClick={() => { navigate('/image-rec'); setMobileMenuOpen(false); }}
+              title="Search by image"
+            >
+              <Camera size={18} />
+            </button>
           </div>
 
-          {/* Mobile Auth Buttons */}
-          <div className="flex flex-col gap-3">
-            <button className="w-full px-5 py-2 border border-wine text-wine rounded-md hover:bg-wine hover:text-white transition-all">
-              Login
-            </button>
-            <button className="w-full px-5 py-2 bg-wine text-white rounded-md hover:bg-opacity-80 transition-all">
-              Signup
-            </button>
-          </div>
+          {isAuthenticated ? (
+            <div className="flex flex-col gap-3">
+              <button onClick={() => { navigate('/cart'); setMobileMenuOpen(false); }} className="flex items-center gap-2 text-wine text-sm py-2">
+                <ShoppingBag size={16} /> Cart {cartCount > 0 && `(${cartCount})`}
+              </button>
+              <button onClick={() => { navigate('/wishlist'); setMobileMenuOpen(false); }} className="flex items-center gap-2 text-wine text-sm py-2">
+                <Heart size={16} /> Wishlist {wishlistItems.length > 0 && `(${wishlistItems.length})`}
+              </button>
+              <button onClick={handleLogout} className="flex items-center gap-2 text-red-500 text-sm py-2">
+                <LogOut size={16} /> Logout
+              </button>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3">
+              <button onClick={() => { openAuth('login'); setMobileMenuOpen(false); }} className="w-full px-5 py-2 border border-wine text-wine rounded-md hover:bg-wine hover:text-white transition-all">Login</button>
+              <button onClick={() => { openAuth('signup'); setMobileMenuOpen(false); }} className="w-full px-5 py-2 bg-wine text-white rounded-md hover:bg-opacity-80 transition-all">Signup</button>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Overlay for mobile menu background */}
       {mobileMenuOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden"
-          onClick={() => setMobileMenuOpen(false)}
-        />
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden" onClick={() => setMobileMenuOpen(false)} />
       )}
 
-      {/* Image Upload Popup */}
-      {isPopupOpen && (
-        <>
-          <div
-            className="fixed inset-0 bg-black bg-opacity-50 z-50"
-            onClick={closePopup}
-          ></div>
-          <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-lg p-6 z-50 w-full max-w-md">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl text-wine font-medium">Upload Image</h2>
-              <button
-                className="text-wine hover:text-gray-600"
-                onClick={closePopup}
-              >
-                <X size={24} />
-              </button>
-            </div>
-            <div className="mb-4">
-              <input
-                type="file"
-                accept="image/*"
-                className="w-full text-wine"
-                onChange={handleFileChange}
-              />
-            </div>
-            <div className="flex justify-end gap-3">
-              <button
-                className="px-4 py-2 border border-wine text-wine rounded-md hover:bg-wine hover:text-white transition-all"
-                onClick={closePopup}
-              >
-                Cancel
-              </button>
-              <button
-                className="px-4 py-2 bg-wine text-white rounded-md hover:bg-opacity-80 transition-all"
-                onClick={handleUpload}
-              >
-                Upload
-              </button>
-            </div>
-          </div>
-        </>
-      )}
+      <AuthModal isOpen={authModal.open} onClose={closeAuth} defaultTab={authModal.tab} />
     </>
   );
 };
