@@ -4,7 +4,7 @@ import { Trash2, Plus, Minus, ShoppingBag, ArrowLeft } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import { useCart } from '../hooks/useStore';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_URL = import.meta.env.VITE_APP_API_URL || 'http://localhost:8000';
 
 interface Product {
     Product_id: number;

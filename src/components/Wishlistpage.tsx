@@ -5,7 +5,7 @@ import Navbar from '../components/Navbar';
 import { useCart } from '../hooks/useStore';
 import { AddToCartButton } from './Cartbuttons';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_URL = import.meta.env.VITE_APP_API_URL || 'http://localhost:8000';
 
 interface Product {
     Product_id: number;
